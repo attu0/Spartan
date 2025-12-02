@@ -1,0 +1,109 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>WebRTC Pi Stream (Debug)</title>
+  <style>
+    body{font-family:system-ui,Segoe UI,Roboto,Arial;background:#111;color:#eee;margin:0;padding:18px}
+    header{ text-align:center; margin-bottom:12px }
+    video{ width:100%; max-width:960px; height:auto; background:#000; border-radius:10px; display:block; margin:8px auto }
+    .controls{ display:flex; gap:8px; justify-content:center; margin:10px 0 }
+    button{ padding:8px 12px; border-radius:6px; background:#2b6cb0;border:none;color:#fff; cursor:pointer }
+    #log{ white-space:pre-wrap; background:#0b0b0b; border-radius:8px; padding:10px; max-height:220px; overflow:auto; margin-top:12px; font-size:13px }
+    .info {text-align:center; color:#9ad;}
+  </style>
+</head>
+<body>
+  <header>
+    <h2>WebRTC Raspberry Pi Stream — Debug Mode</h2>
+    <div class="info">Click <b>Start</b> once to allow video autoplay and begin the handshake.</div>
+  </header>
+
+  <div style="text-align:center;">
+    <video id="video" playsinline autoplay controls></video>
+  </div>
+
+  <div class="controls">
+    <button id="startBtn">Start</button>
+    <button id="reloadBtn">Reload Offer</button>
+    <button id="statsBtn">Get Stats</button>
+  </div>
+
+  <div id="log">Log messages will appear here.</div>
+
+<script>
+const logEl = document.getElementById('log');
+const video = document.getElementById('video');
+const startBtn = document.getElementById('startBtn');
+const reloadBtn = document.getElementById('reloadBtn');
+const statsBtn = document.getElementById('statsBtn');
+
+function log(...args){
+  const s = args.map(a => (typeof a === 'object' ? JSON.stringify(a, null, 2) : String(a))).join(' ');
+  console.log(...args);
+  logEl.textContent = `${new Date().toLocaleTimeString()}  ${s}\n\n` + logEl.textContent;
+}
+
+let pc = null;
+
+async function start() {
+  startBtn.disabled = true;
+  log('Starting handshake...');
+
+  // fetch offer
+  let res = await fetch('/offer');
+  if (!res.ok) { log('Failed to fetch /offer', res.status); startBtn.disabled=false; return; }
+  const offer = await res.json();
+  if (!offer || !offer.sdp) { log('No offer available yet.'); startBtn.disabled=false; return; }
+
+  pc = new RTCPeerConnection();
+  pc.ontrack = (ev) => {
+    log('ontrack event:', ev);
+    video.srcObject = ev.streams[0] || ev.streams;
+    log('Attached stream to <video>');
+  };
+  pc.onconnectionstatechange = () => log('connectionState:', pc.connectionState);
+  pc.oniceconnectionstatechange = () => log('iceConnectionState:', pc.iceConnectionState);
+  pc.onicegatheringstatechange = () => log('iceGatheringState:', pc.iceGatheringState);
+  pc.onicecandidate = (c) => log('icecandidate:', c && (c.candidate||c));
+
+  try {
+    await pc.setRemoteDescription(offer);
+    log('Remote description set.');
+    const answer = await pc.createAnswer();
+    await pc.setLocalDescription(answer);
+    log('Local description created.');
+    // Post answer
+    const post = await fetch('/answer', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ sdp: pc.localDescription.sdp, type: pc.localDescription.type })
+    });
+    log('Posted /answer', post.status);
+  } catch (e) {
+    log('Error during handshake:', e);
+    startBtn.disabled=false;
+    return;
+  }
+  log('Handshake complete. Waiting for ontrack...');
+}
+
+// reload our page's offer (useful if Pi restarted)
+reloadBtn.addEventListener('click', async () => {
+  const r = await fetch('/offer'); log('/offer ->', r.status);
+});
+
+// get stats
+statsBtn.addEventListener('click', async () => {
+  if (!pc) { log('No PeerConnection yet'); return; }
+  const stats = await pc.getStats();
+  stats.forEach(report => {
+    log('STAT', report.type, report.id, report);
+  });
+});
+
+startBtn.addEventListener('click', start);
+</script>
+</body>
+</html>
