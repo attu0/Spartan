@@ -1,0 +1,130 @@
+<?xml version="1.0"?>
+
+<robot name="spartan_description" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <xacro:include filename="$(find spartan_description)/urdf/mech/materials.xacro" />
+    <xacro:include filename="$(find spartan_description)/urdf/mech/links.trans" />
+    <xacro:include filename="$(find spartan_description)/urdf/mech/gazeboreference.xacro" />
+
+    <xacro:include filename="$(find spartan_description)/urdf/mech/base.urdf.xacro"/>
+
+    <!-- ================= Robotic Arm ================= -->
+
+    <link name="base_link">
+        <inertial>
+            <origin xyz="-1.7801871495357475e-17 0.0 0.021" rpy="0 0 0" />
+            <mass value="1.0371236783056947" />
+            <inertia ixx="0.00216" iyy="0.00216" izz="0.004016" ixy="0.0" iyz="0.0" ixz="-0.0" />
+        </inertial>
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+                <mesh filename="package://spartan_description/meshes/base_link.stl"
+                    scale="0.001 0.001 0.001" />
+            </geometry>
+            <material name="silver" />
+        </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+                <mesh filename="package://spartan_description/meshes/base_link.stl"
+                    scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+
+    <link name="shoulder_joint_1">
+        <inertial>
+            <origin xyz="-1.1058193531197054e-17 -2.2116387062394108e-17 0.028693112951202672"
+                rpy="0 0 0" />
+            <mass value="0.8347992099208558" />
+            <inertia ixx="0.002257" iyy="0.001671" izz="0.002679" ixy="-0.0" iyz="-0.0" ixz="-0.0" />
+        </inertial>
+        <visual>
+            <origin xyz="-0.0 -0.0 -0.042" rpy="0 0 0" />
+            <geometry>
+                <mesh filename="package://spartan_description/meshes/shoulder_joint_1.stl"
+                    scale="0.001 0.001 0.001" />
+            </geometry>
+            <material name="silver" />
+        </visual>
+        <collision>
+            <origin xyz="-0.0 -0.0 -0.042" rpy="0 0 0" />
+            <geometry>
+                <mesh filename="package://spartan_description/meshes/shoulder_joint_1.stl"
+                    scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+
+    <link name="shoulder_link_1">
+        <inertial>
+            <origin xyz="-6.525965052388168e-15 0.00028853892713764614 0.036803251637408"
+                rpy="0 0 0" />
+            <mass value="0.22986605225349233" />
+            <inertia ixx="0.000434" iyy="0.000474" izz="8.1e-05" ixy="0.0" iyz="-4e-06" ixz="0.0" />
+        </inertial>
+        <visual>
+            <origin xyz="-0.0 -0.0 -0.132" rpy="0 0 0" />
+            <geometry>
+                <mesh filename="package://spartan_description/meshes/shoulder_link_1.stl"
+                    scale="0.001 0.001 0.001" />
+            </geometry>
+            <material name="silver" />
+        </visual>
+        <collision>
+            <origin xyz="-0.0 -0.0 -0.132" rpy="0 0 0" />
+            <geometry>
+                <mesh filename="package://spartan_description/meshes/shoulder_link_1.stl"
+                    scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+
+    <link name="elbow_link_1">
+        <inertial>
+            <origin xyz="8.210853317301837e-15 0.0032546291648698454 0.02520164796922139"
+                rpy="0 0 0" />
+            <mass value="0.1524453603735402" />
+            <inertia ixx="0.000148" iyy="0.000181" izz="5.2e-05" ixy="0.0" iyz="-1e-05" ixz="0.0" />
+        </inertial>
+        <visual>
+            <origin xyz="-0.0 -0.026 -0.225" rpy="0 0 0" />
+            <geometry>
+                <mesh filename="package://spartan_description/meshes/elbow_link_1.stl"
+                    scale="0.001 0.001 0.001" />
+            </geometry>
+            <material name="silver" />
+        </visual>
+        <collision>
+            <origin xyz="-0.0 -0.026 -0.225" rpy="0 0 0" />
+            <geometry>
+                <mesh filename="package://spartan_description/meshes/elbow_link_1.stl"
+                    scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+
+    <joint name="Revolute 1" type="continuous">
+        <origin xyz="0.0 0.0 0.042" rpy="0 0 0" />
+        <parent link="base_link" />
+        <child link="shoulder_joint_1" />
+        <axis xyz="0.0 0.0 1.0" />
+    </joint>
+
+    <joint name="Revolute 2" type="revolute">
+        <origin xyz="0.0 0.0 0.09" rpy="0 0 0" />
+        <parent link="shoulder_joint_1" />
+        <child link="shoulder_link_1" />
+        <axis xyz="0.0 -1.0 0.0" />
+        <limit upper="1.570796" lower="-1.570796" effort="100" velocity="100" />
+    </joint>
+
+    <joint name="Revolute 3" type="continuous">
+        <origin xyz="0.0 0.026 0.093" rpy="0 0 0" />
+        <parent link="shoulder_link_1" />
+        <child link="elbow_link_1" />
+        <axis xyz="0.0 1.0 0.0" />
+    </joint>
+
+</robot>

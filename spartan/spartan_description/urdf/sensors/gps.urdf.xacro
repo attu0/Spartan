@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:macro name="gps" params="
+    prefix:=''
+    gps_name:='gps'
+    parent:='base_link'
+    xyz_offset:='0 0 0.08'
+    rpy_offset:='0 0 0'
+    gps_length:=0.04
+    gps_width:=0.04
+    gps_height:=0.015
+    gps_mass:=0.05
+    material_name:='blue'
+    material_color:='0 0 1 1'
+  ">
+
+    <!-- GPS mounting joint -->
+    <joint name="${prefix}${gps_name}_joint" type="fixed">
+      <parent link="${prefix}${parent}"/>
+      <child link="${prefix}${gps_name}_link"/>
+      <origin xyz="${xyz_offset}" rpy="${rpy_offset}"/>
+    </joint>
+
+    <!-- GPS link -->
+    <link name="${prefix}${gps_name}_link">
+
+      <!-- Visual geometry -->
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <box size="${gps_length} ${gps_width} ${gps_height}"/>
+        </geometry>
+        <material name="${material_name}">
+          <color rgba="${material_color}"/>
+        </material>
+      </visual>
+
+      <!-- Collision geometry -->
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <box size="${gps_length} ${gps_width} ${gps_height}"/>
+        </geometry>
+      </collision>
+
+      <!-- Inertial properties -->
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <mass value="${gps_mass}"/>
+        <inertia
+          ixx="${(1.0/12.0) * gps_mass * (gps_width*gps_width + gps_height*gps_height)}"
+          ixy="0.0"
+          ixz="0.0"
+          iyy="${(1.0/12.0) * gps_mass * (gps_length*gps_length + gps_height*gps_height)}"
+          iyz="0.0"
+          izz="${(1.0/12.0) * gps_mass * (gps_length*gps_length + gps_width*gps_width)}"/>
+      </inertial>
+
+    </link>
+
+    <!-- Gazebo material -->
+    <gazebo reference="${prefix}${gps_name}_link">
+      <material>Gazebo/Blue</material>
+    </gazebo>
+
+  </xacro:macro>
+
+</robot>

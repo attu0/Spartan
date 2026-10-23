@@ -1,0 +1,137 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="spartan_with_arm">
+    <xacro:include filename="$(find spartan_description)/urdf/mech/wheel.urdf.xacro" />
+    <xacro:include filename="$(find spartan_description)/urdf/mech/base.urdf.xacro" />
+    <xacro:include filename="$(find spartan_description)/urdf/sensors/gps.urdf.xacro" />
+    <xacro:include filename="$(find spartan_description)/urdf/mech/materials.xacro" />
+    <xacro:include filename="$(find spartan_description)/urdf/mech/links.trans" />
+    <xacro:include filename="$(find spartan_description)/urdf/mech/gazeboreference.xacro" />
+    <xacro:arg name="robot_name" default="spartan" />
+    <xacro:arg name="prefix" default="" />
+    <xacro:arg name="use_gazebo" default="false" />
+    <xacro:property name="base_length" value="0.420" />
+    <xacro:property name="base_width" value="0.120" />
+    <xacro:property name="base_height" value="0.120" />
+    <xacro:property name="base_mass" value="5.0" />
+    <xacro:property name="wheel_radius" value="0.085" />
+    <xacro:property name="wheel_width" value="0.140" />
+    <xacro:property name="wheel_mass" value="0.20" />
+    <xacro:property name="caster_radius" value="0.015" />
+    <xacro:property name="caster_mass" value="0.05" />
+    <xacro:base prefix="$(arg prefix)" base_name="base" parent="base_footprint" xyz_offset="0 0 0" rpy_offset="0 0 0" base_length="${base_length}" base_width="${base_width}" base_height="${base_height}" base_mass="${base_mass}" />
+    <xacro:wheel prefix="$(arg prefix)" wheel_name="front_left_wheel" parent="base_link" xyz_offset="0.170 0.1575 0.020" rpy_offset="0 0 0" axis="0 1 0" wheel_radius="${wheel_radius}" wheel_width="${wheel_width}" wheel_mass="${wheel_mass}" />
+    <xacro:wheel prefix="$(arg prefix)" wheel_name="rear_right_wheel" parent="base_link" xyz_offset="-0.170 -0.1575 0.020" rpy_offset="0 0 0" axis="0 1 0" wheel_radius="${wheel_radius}" wheel_width="${wheel_width}" wheel_mass="${wheel_mass}" />
+    <xacro:wheel prefix="$(arg prefix)" wheel_name="rear_left_wheel" parent="base_link" xyz_offset="0.170 -0.1575 0.020" rpy_offset="0 0 0" axis="0 1 0" wheel_radius="${wheel_radius}" wheel_width="${wheel_width}" wheel_mass="${wheel_mass}" />
+    <xacro:wheel prefix="$(arg prefix)" wheel_name="front_right_wheel" parent="base_link" xyz_offset="-0.170 0.1575 0.020" rpy_offset="0 0 0" axis="0 1 0" wheel_radius="${wheel_radius}" wheel_width="${wheel_width}" wheel_mass="${wheel_mass}" />
+    <xacro:gps prefix="$(arg prefix)" gps_name="gps" parent="base_link" xyz_offset="0 0 0.055" rpy_offset="0 0 0" />
+    <link name="arm_base_link">
+        <inertial>
+            <origin xyz="-1.7801871495357475e-17 0.0 0.021" rpy="0 0 0" />
+            <mass value="1.0371236783056947" />
+            <inertia ixx="0.00216" iyy="0.00216" izz="0.004016" ixy="0.0" iyz="0.0" ixz="-0.0" />
+        </inertial>
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+                <mesh filename="package://spartan_description/meshes/base_link.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+            <material name="silver" />
+        </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+                <mesh filename="package://spartan_description/meshes/base_link.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="shoulder_joint_1">
+        <inertial>
+            <origin xyz="-1.1058193531197054e-17 -2.2116387062394108e-17 0.028693112951202672" rpy="0 0 0" />
+            <mass value="0.8347992099208558" />
+            <inertia ixx="0.002257" iyy="0.001671" izz="0.002679" ixy="-0.0" iyz="-0.0" ixz="-0.0" />
+        </inertial>
+        <visual>
+            <origin xyz="-0.0 -0.0 -0.042" rpy="0 0 0" />
+            <geometry>
+                <mesh filename="package://spartan_description/meshes/shoulder_joint_1.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+            <material name="silver" />
+        </visual>
+        <collision>
+            <origin xyz="-0.0 -0.0 -0.042" rpy="0 0 0" />
+            <geometry>
+                <mesh filename="package://spartan_description/meshes/shoulder_joint_1.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="shoulder_link_1">
+        <inertial>
+            <origin xyz="-6.525965052388168e-15 0.00028853892713764614 0.036803251637408" rpy="0 0 0" />
+            <mass value="0.22986605225349233" />
+            <inertia ixx="0.000434" iyy="0.000474" izz="8.1e-05" ixy="0.0" iyz="-4e-06" ixz="0.0" />
+        </inertial>
+        <visual>
+            <origin xyz="-0.0 -0.0 -0.132" rpy="0 0 0" />
+            <geometry>
+                <mesh filename="package://spartan_description/meshes/shoulder_link_1.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+            <material name="silver" />
+        </visual>
+        <collision>
+            <origin xyz="-0.0 -0.0 -0.132" rpy="0 0 0" />
+            <geometry>
+                <mesh filename="package://spartan_description/meshes/shoulder_link_1.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="elbow_link_1">
+        <inertial>
+            <origin xyz="8.210853317301837e-15 0.0032546291648698454 0.02520164796922139" rpy="0 0 0" />
+            <mass value="0.1524453603735402" />
+            <inertia ixx="0.000148" iyy="0.000181" izz="5.2e-05" ixy="0.0" iyz="-1e-05" ixz="0.0" />
+        </inertial>
+        <visual>
+            <origin xyz="-0.0 -0.026 -0.225" rpy="0 0 0" />
+            <geometry>
+                <mesh filename="package://spartan_description/meshes/elbow_link_1.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+            <material name="silver" />
+        </visual>
+        <collision>
+            <origin xyz="-0.0 -0.026 -0.225" rpy="0 0 0" />
+            <geometry>
+                <mesh filename="package://spartan_description/meshes/elbow_link_1.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <joint name="arm_mount_joint" type="fixed">
+        <parent link="base_link" />
+        <child link="arm_base_link" />
+        <origin xyz="-0.1 0 0.1" rpy="0 0 0" />
+    </joint>
+    <joint name="arm_revolute_1" type="revolute">
+        <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
+        <parent link="arm_base_link"/>
+        <child link="shoulder_joint_1"/>
+        <axis xyz="0.0 0.0 1.0"/>
+        <limit lower="-1.570796" upper="1.570796" effort="100" velocity="100"/>
+    </joint>
+    <joint name="arm_revolute_2" type="revolute">
+        <origin xyz="0.0 0.0 0.09" rpy="0 0 0" />
+        <parent link="shoulder_joint_1" />
+        <child link="shoulder_link_1" />
+        <axis xyz="0.0 -1.0 0.0" />
+        <limit upper="1.570796" lower="-1.570796" effort="100" velocity="100" />
+    </joint>
+    <joint name="arm_revolute_3" type="revolute">
+        <origin xyz="0.0 0.026 0.093" rpy="0 0 0"/>
+        <parent link="shoulder_link_1"/>
+        <child link="elbow_link_1"/>
+        <axis xyz="0.0 1.0 0.0"/>
+        <limit
+            lower="-1.570796"
+            upper="1.570796"
+            effort="100"
+            velocity="100"/>
+    </joint>
+</robot>
