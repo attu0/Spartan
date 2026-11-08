@@ -1,0 +1,20 @@
+services:
+  spartan_depth_cam:
+    build: .
+    image: spartan_depth_cam:jazzy
+    container_name: spartan_depth_cam
+    network_mode: host            # ROS 2 discovery reaches your laptop / RViz
+    ipc: host                     # avoids Fast DDS shared-memory problems with host networking
+    environment:
+      - ROS_DOMAIN_ID=0           # must match the machine running RViz
+    volumes:
+      - /dev:/dev                 # the camera's /dev/videoN can change when replugged
+      # to use a newer calibration without rebuilding, mount it and add calib:=/calib/stereo_calib.npz below
+      # - ./calib:/calib:ro
+    device_cgroup_rules:
+      - "c 81:* rmw"              # allow video4linux devices (major 81) only
+    stdin_open: true
+    tty: true
+    command: >
+      ros2 launch spartan_depth_cam stereo.launch.py
+      scale:=0.25 num_disp:=32 max_rate:=10.0
