@@ -1,0 +1,12 @@
+// Animation: Animation
+const uint32_t animation[][5] = {
+    {0x00000000, 0x00000000, 0x00000000, 0x00000000, 500},  // frame_1
+    {0xc7fe3ff1, 0xc78e3c71, 0xe38ffc7f, 0xe3000000, 500},  // frame_2
+    {0xff07f830, 0xc1860c30, 0x6183ffff, 0xff000000, 500},  // frame_3
+    {0xfffffff1, 0x818c0c60, 0x6303ffff, 0xff000000, 500},  // frame_4_copy
+    {0xff1ff9f0, 0xdf87cc3c, 0x61c3ffff, 0xff000000, 500},  // frame_5
+    {0xf0070038, 0x01ffffff, 0xf003801e, 0x00000000, 500},  // frame_6
+    {0xfffffff1, 0x818c0c60, 0x6303ffff, 0xff000000, 500},  // frame_4
+    {0xffffffc0, 0x780f01e0, 0x3c03ffff, 0xff000000, 500},  // frame_8
+    {0x00000000, 0x00000000, 0x00000000, 0x00000000, 500},  // frame_1_copy
+};

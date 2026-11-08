@@ -2,6 +2,10 @@
 #include <CNCShield.h>
 #include <AccelStepper.h>
 #include <Servo.h>
+#include "Arduino_LED_Matrix.h"
+#include "Animation.h"
+
+Arduino_LED_Matrix matrix;
 
 // ============================================================
 // CNC SHIELD
@@ -76,6 +80,12 @@ AccelStepper stepperA(AccelStepper::DRIVER, A_STEP_PIN, A_DIR_PIN);
 void setup() {
   Bridge.begin();   // must come first, before any Bridge.provide()
 
+  // Initialize the onboard 8x13 LED matrix
+  matrix.begin();
+
+  // Load the animation sequence into the matrix buffer
+  matrix.loadSequence(animation);
+
   pinMode(A_STEP_PIN, OUTPUT);
   pinMode(A_DIR_PIN, OUTPUT);
 
@@ -122,6 +132,9 @@ void setup() {
 // ============================================================
 
 void loop() {
+
+  // Plays through one iteration of the loaded sequence using the per-frame delay (500 ms)
+  matrix.playSequence();
   stepperX.runSpeed();
   stepperY.runSpeed();
   stepperZ.runSpeed();
