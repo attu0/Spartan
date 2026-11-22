@@ -6,6 +6,19 @@
 
 Traversing rugged, unstructured terrain — agricultural fields, mining sites, hazardous exploration zones — while performing precise manipulation tasks is difficult for wheeled robots and manual human intervention alike. Field workers, disaster-response teams, and inspection personnel often need a platform that can navigate uneven ground and interact with objects (spraying, sorting, sampling) without putting a person in the risk zone.
 
+## Table of Contents
+
+- [How It Works](#how-it-works)
+- [Key Features](#key-features)
+- [Bill of Materials](#bill-of-materials)
+- [System Architecture & Circuit](#system-architecture--circuit)
+- [Code Structure](#code-structure)
+- [Demo Video](#demo-video)
+- [Testing & Results](#testing--results)
+- [Challenges, Learnings & Future Improvements](#challenges-learnings--future-improvements)
+- [Inspirational Sources](#star2-inspirational-sources)
+- [Contributing](#raised_hands-contributing)
+
 ## How It Works
 
 The All Terrain Rover is an Unmanned Ground Vehicle (UGV) built for navigating rough terrain while performing precise manipulation tasks. It uses a track-based locomotion system on an aluminum chassis with 3D-printed tracks, giving it smoother impact absorption and stability across uneven ground compared to wheeled platforms.
@@ -13,6 +26,14 @@ The All Terrain Rover is an Unmanned Ground Vehicle (UGV) built for navigating r
 Mounted on top is a 4-DOF robotic arm, actuated by NEMA17 stepper motors and an MG996R servo through a CNC shield, capable of high-precision positional movement for tasks like object sorting, targeted spraying, and sampling.
 
 The system is controlled through a local web dashboard hosted on the Arduino UNO Q, which streams a live video feed from an onboard stereo AR0144 camera and lets an operator teleoperate both the rover and the arm in real time. The UNO Q acts as the central brain — directly driving the arm and handling vision — while an Arduino Mega runs dedicated locomotion firmware for the tracks, executing movement commands sent from the UNO Q.
+
+## Key Features
+
+- **Track-based locomotion** on an aluminum chassis with 3D-printed tracks for stability on uneven ground
+- **4-DOF robotic arm** driven by NEMA17 steppers and an MG996R servo for precise manipulation
+- **Live stereo camera feed** (AR0144) with local depth estimation
+- **Web-based teleoperation** dashboard (Streamlit) usable on both mobile and desktop
+- **Split control architecture** — UNO Q for arm and vision, Arduino Mega for rover locomotion
 
 ## Bill of Materials
 
@@ -37,18 +58,19 @@ The system is controlled through a local web dashboard hosted on the Arduino UNO
 
 ### Signal Flow
 
-Rover motors → Arduino Mega
-Arduino Mega → UNO Q (via USB hub, serial)
-Robotic arm motors → CNC shield (mounted on UNO Q)
-Stereo camera → USB hub → UNO Q
+```text
+Rover motors          → Arduino Mega
+Arduino Mega          → UNO Q (via USB hub, serial)
+Robotic arm motors    → CNC shield (mounted on UNO Q)
+Stereo camera         → USB hub → UNO Q
+```
 
-### UNO Q:
+### UNO Q
 
-drives the arm directly
-talks to the Mega serially for rover control
-processes the onboard stereo depth feed
-hosts the control dashboard over Streamlit
-
+- Drives the arm directly
+- Talks to the Mega serially for rover control
+- Processes the onboard stereo depth feed
+- Hosts the control dashboard over Streamlit
 
 ### Block Diagram & Circuit Schematic
 
@@ -71,6 +93,31 @@ hosts the control dashboard over Streamlit
 ## Demo Video
 
 [Watch on Google Drive](https://drive.google.com/file/d/10mO3DqsJaEezeDgVusVye5emnCNlNR8r/view?usp=drive_link)
+
+### YouTube Videos
+
+<table align="center">
+  <tr>
+    <td align="center">
+      <a href="https://youtu.be/5AdjQfucNJw">
+        <img src="https://img.youtube.com/vi/5AdjQfucNJw/hqdefault.jpg" width="320" alt="All Terrain Rover — YouTube video 1"><br>
+        ▶ Watch on YouTube
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://youtu.be/NpJTIPIWjXk">
+        <img src="https://img.youtube.com/vi/NpJTIPIWjXk/hqdefault.jpg" width="320" alt="All Terrain Rover — YouTube video 2"><br>
+        ▶ Watch on YouTube
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://youtube.com/shorts/MoncBIeyiao">
+        <img src="https://img.youtube.com/vi/MoncBIeyiao/hqdefault.jpg" width="180" alt="All Terrain Rover — YouTube Short"><br>
+        ▶ Watch the Short
+      </a>
+    </td>
+  </tr>
+</table>
 
 ## Testing & Results
 
