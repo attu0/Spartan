@@ -1,6 +1,5 @@
 #include "Arduino_RouterBridge.h"
 #include <CNCShield.h>
-#include <AccelStepper.h>
 #include <Servo.h>
 #include "Arduino_LED_Matrix.h"
 #include "Animation.h"
@@ -13,9 +12,9 @@ Arduino_LED_Matrix matrix;
 
 CNCShield cnc_shield;
 
-StepperMotor *motorX;
-StepperMotor *motorY;
-StepperMotor *motorZ;
+StepperMotor *motorX; // X-axis (Driver 1)
+StepperMotor *motorY; // Y-axis (Driver 2)
+StepperMotor *motorZ; // Z-axis (Driver 3 - Shoulder Side 1)
 
 // ============================================================
 // A AXIS — driven directly, bypassing CNCShield (library only
@@ -38,13 +37,15 @@ Servo gripperServo;
 int servoAngle = SERVO_OPEN_ANGLE;  // current angle, for UI state
 
 // ============================================================
-// FIXED MOTOR SPEEDS
+// MOTOR STEP TIMING (smaller = faster, in microseconds)
 // ============================================================
 
-const float X_SPEED = 50.0;
-const float Y_SPEED = 50.0;
-const float Z_SPEED = 50.0;
-const float A_SPEED = 50.0;
+const int STEP_DELAY_US = 1500;
+
+unsigned long lastStepMicrosX = 0;
+unsigned long lastStepMicrosY = 0;
+unsigned long lastStepMicrosZ = 0;
+unsigned long lastStepMicrosA = 0;
 
 // ============================================================
 // CURRENT MOTOR STATE (-1, 0, 1)
@@ -54,24 +55,7 @@ int directionX = 0;
 int directionY = 0;
 int directionZ = 0;
 int directionA = 0;
-
-// ============================================================
-// ACCELSTEPPER CALLBACKS
-// ============================================================
-
-void xForward()  { motorX->step(CLOCKWISE); }
-void xBackward() { motorX->step(COUNTER); }
-
-void yForward()  { motorY->step(CLOCKWISE); }
-void yBackward() { motorY->step(COUNTER); }
-
-void zForward()  { motorZ->step(CLOCKWISE); }
-void zBackward() { motorZ->step(COUNTER); }
-
-AccelStepper stepperX(xForward, xBackward);
-AccelStepper stepperY(yForward, yBackward);
-AccelStepper stepperZ(zForward, zBackward);
-AccelStepper stepperA(AccelStepper::DRIVER, A_STEP_PIN, A_DIR_PIN);
+int pumpState = 0;
 
 // ============================================================
 // SETUP
@@ -88,22 +72,15 @@ void setup() {
 
   pinMode(A_STEP_PIN, OUTPUT);
   pinMode(A_DIR_PIN, OUTPUT);
+  digitalWrite(A_STEP_PIN, LOW);
+  digitalWrite(A_DIR_PIN, LOW);
 
   cnc_shield.begin();
+  cnc_shield.enable(); // Enables all 4 drivers (Pin 8 LOW)
 
   motorX = cnc_shield.get_motor(0);
   motorY = cnc_shield.get_motor(1);
   motorZ = cnc_shield.get_motor(2);
-
-  stepperX.setMaxSpeed(X_SPEED);
-  stepperY.setMaxSpeed(Y_SPEED);
-  stepperZ.setMaxSpeed(Z_SPEED);
-  stepperA.setMaxSpeed(A_SPEED);
-
-  stepperX.setSpeed(0);
-  stepperY.setSpeed(0);
-  stepperZ.setSpeed(0);
-  stepperA.setSpeed(0);
 
   gripperServo.attach(SERVO_PIN);
   gripperServo.write(servoAngle);
@@ -125,6 +102,11 @@ void setup() {
 
   Bridge.provide("set_servo_angle", set_servo_angle);
   Bridge.provide("get_servo_angle", get_servo_angle);
+
+  // Compatibility wrappers for high-level rover commands
+  Bridge.provide("drive", bridge_drive);
+  Bridge.provide("arm", bridge_arm);
+  Bridge.provide("pump", bridge_pump);
 }
 
 // ============================================================
@@ -135,10 +117,31 @@ void loop() {
 
   // Plays through one iteration of the loaded sequence using the per-frame delay (500 ms)
   matrix.playSequence();
-  stepperX.runSpeed();
-  stepperY.runSpeed();
-  stepperZ.runSpeed();
-  stepperA.runSpeed();
+
+  unsigned long now = micros();
+
+  if (directionX != 0 && (now - lastStepMicrosX >= (unsigned long)STEP_DELAY_US)) {
+    lastStepMicrosX = now;
+    motorX->step();
+  }
+
+  if (directionY != 0 && (now - lastStepMicrosY >= (unsigned long)STEP_DELAY_US)) {
+    lastStepMicrosY = now;
+    motorY->step();
+  }
+
+  if (directionZ != 0 && (now - lastStepMicrosZ >= (unsigned long)STEP_DELAY_US)) {
+    lastStepMicrosZ = now;
+    motorZ->step();
+  }
+
+  if (directionA != 0 && (now - lastStepMicrosA >= (unsigned long)STEP_DELAY_US)) {
+    lastStepMicrosA = now;
+    digitalWrite(A_STEP_PIN, HIGH);
+    delayMicroseconds(10);
+    digitalWrite(A_STEP_PIN, LOW);
+  }
+
   // servo is positional — no per-loop update needed, it just
   // holds whatever angle it was last commanded to
 }
@@ -150,13 +153,21 @@ void loop() {
 void set_motor_x(int direction) {
   direction = clampDirection(direction);
   directionX = direction;
-  stepperX.setSpeed(directionX * X_SPEED);
+  if (directionX > 0) {
+    motorX->set_dir(CLOCKWISE);
+  } else if (directionX < 0) {
+    motorX->set_dir(COUNTER);
+  }
 }
 
 void set_motor_y(int direction) {
   direction = clampDirection(direction);
   directionY = direction;
-  stepperY.setSpeed(directionY * Y_SPEED);
+  if (directionY > 0) {
+    motorY->set_dir(CLOCKWISE);
+  } else if (directionY < 0) {
+    motorY->set_dir(COUNTER);
+  }
 }
 
 // ============================================================
@@ -170,15 +181,18 @@ void set_joint_za(int direction) {
   directionZ = direction;
   directionA = -direction;   // A always spins opposite to Z
 
-  stepperZ.setSpeed(directionZ * Z_SPEED);
-  stepperA.setSpeed(directionA * A_SPEED);
+  if (direction > 0) {
+    motorZ->set_dir(CLOCKWISE);
+    digitalWrite(A_DIR_PIN, LOW);   // Opposite of Z
+  } else if (direction < 0) {
+    motorZ->set_dir(COUNTER);
+    digitalWrite(A_DIR_PIN, HIGH);  // Opposite of Z
+  }
 }
 
 void stop_joint_za() {
   directionZ = 0;
   directionA = 0;
-  stepperZ.setSpeed(0);
-  stepperA.setSpeed(0);
 }
 
 int get_joint_za() {
@@ -191,12 +205,10 @@ int get_joint_za() {
 
 void stop_motor_x() {
   directionX = 0;
-  stepperX.setSpeed(0);
 }
 
 void stop_motor_y() {
   directionY = 0;
-  stepperY.setSpeed(0);
 }
 
 // ============================================================
@@ -207,6 +219,7 @@ void stop_all() {
   stop_motor_x();
   stop_motor_y();
   stop_joint_za();
+  pumpState = 0;
   // servo has no "stop" concept now — it just holds position
 }
 
@@ -230,6 +243,33 @@ void set_servo_angle(int angle) {
 
 int get_servo_angle() {
   return servoAngle;
+}
+
+// ============================================================
+// HIGH-LEVEL BRIDGE WRAPPERS
+// ============================================================
+
+void bridge_drive(float left, float right) {
+  int dirL = (left > 0.15f) ? 1 : ((left < -0.15f) ? -1 : 0);
+  int dirR = (right > 0.15f) ? 1 : ((right < -0.15f) ? -1 : 0);
+  set_motor_x(dirL);
+  set_motor_y(dirR);
+}
+
+void bridge_arm(int base, int shoulder, int elbow) {
+  (void)base;
+  if (shoulder > 90) {
+    set_joint_za(1);
+  } else if (shoulder < 90) {
+    set_joint_za(-1);
+  } else {
+    stop_joint_za();
+  }
+  set_servo_angle(elbow);
+}
+
+void bridge_pump(int on) {
+  pumpState = (on != 0) ? 1 : 0;
 }
 
 // ============================================================

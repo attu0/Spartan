@@ -1,28 +1,35 @@
-# ROS 2 Jazzy container for the Spartan stereo depth camera (Arduino UNO Q, arm64).
-# Build context is this folder (python/): src/ holds the ROS 2 packages.
-FROM ros:jazzy-ros-base
+FROM ros:jazzy
 
 ENV DEBIAN_FRONTEND=noninteractive
+ENV ROS_DISTRO=jazzy
+ENV COLCON_WS=/opt/ros_ws
+
+SHELL ["/bin/bash", "-c"]
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-        python3-opencv \
-        python3-numpy \
-        python3-setuptools \
-        python3-colcon-common-extensions \
-        ros-jazzy-tf2-ros \
-        v4l-utils \
-        tmux \
+    python3-colcon-common-extensions \
+    python3-rosdep \
+    python3-pip \
+    tmux \
     && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /ws
-COPY src/ /ws/src/
-RUN . /opt/ros/jazzy/setup.sh && colcon build
+WORKDIR ${COLCON_WS}
+COPY src/spartan ${COLCON_WS}/src/spartan
 
-# every shell (docker exec -it ... bash / tmux panes) gets ROS + the workspace
-RUN echo "source /opt/ros/jazzy/setup.bash" >> /root/.bashrc \
- && echo "source /ws/install/setup.bash" >> /root/.bashrc
+RUN rosdep init 2>/dev/null || true && \
+    apt-get update && \
+    rosdep update && \
+    rosdep install --from-paths src --ignore-src -r -y && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN source /opt/ros/${ROS_DISTRO}/setup.bash && \
+    colcon build --symlink-install
+
+RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> /etc/bash.bashrc && \
+    echo "if [ -f ${COLCON_WS}/install/setup.bash ]; then source ${COLCON_WS}/install/setup.bash; fi" >> /etc/bash.bashrc
 
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
+
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["bash"]

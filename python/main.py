@@ -1,5 +1,5 @@
-import time
 import threading
+import time
 import random
 import datetime
 
@@ -49,6 +49,14 @@ def log(msg):
     web_ui.send_message("log", msg)
 
 
+def _dir_from_val(val, deadband=0.15):
+    if val > deadband:
+        return 1
+    if val < -deadband:
+        return -1
+    return 0
+
+
 def wheel_speeds(linear, angular):
     """Differential drive mix -> (left, right) in -1..1."""
     left = max(-1.0, min(1.0, linear - angular * 0.7))
@@ -58,12 +66,14 @@ def wheel_speeds(linear, angular):
 
 def apply_drive():
     left, right = wheel_speeds(state["linear"], state["angular"])
-    mcu("drive", left, right)          # sketch: drive(float left, float right)
+    mcu("set_motor_x", _dir_from_val(left))
+    mcu("set_motor_y", _dir_from_val(right))
 
 
 def stop_motors():
     state["linear"] = state["angular"] = 0.0
-    mcu("drive", 0.0, 0.0)
+    mcu("stop_motor_x")
+    mcu("stop_motor_y")
 
 
 # ---------------- Socket handlers ----------------
@@ -78,6 +88,7 @@ def on_drive(sid, data):
 def on_estop(sid, data):
     with lock:
         stop_motors()
+        mcu("stop_all")
     set_pump(False)
     log("E-STOP")
 
@@ -91,13 +102,24 @@ def on_arm(sid, data):
     base = max(0, min(180, base))
     shoulder = max(25, min(160, shoulder))
     elbow = max(20, min(160, elbow))
+    prev_shoulder = state["arm"][1]
     state["arm"] = [base, shoulder, elbow]
-    mcu("arm", base, shoulder, elbow)  # sketch: arm(int base, int shoulder, int elbow)
+
+    delta_s = shoulder - prev_shoulder
+    if delta_s > 0:
+        mcu("set_joint_za", 1)
+    elif delta_s < 0:
+        mcu("set_joint_za", -1)
+    else:
+        mcu("stop_joint_za")
+
+    mcu("set_servo_angle", elbow)
 
 
 def set_pump(on):
     state["spraying"] = on
-    mcu("pump", 1 if on else 0)        # sketch: pump(int on)
+    if on:
+        log("Pump state ON (no MCU pump bridge handler registered)")
 
 
 def spray_for(ms):
@@ -216,8 +238,11 @@ def resources_loop():
             ts = int(datetime.datetime.now().timestamp() * 1000)
             cpu = psutil.cpu_percent(interval=1)
             vm = psutil.virtual_memory()
-            db.write_sample("cpu", cpu, ts)
-            db.write_sample("mem", vm.percent, ts)
+            try:
+                db.write_sample("cpu", cpu, ts)
+                db.write_sample("mem", vm.percent, ts)
+            except Exception:
+                pass
             web_ui.send_message("cpu_usage", {"value": cpu, "ts": ts})
             web_ui.send_message("memory_usage", {
                 "value": vm.percent, "ts": ts,
@@ -252,4 +277,5 @@ def telemetry_loop():
 
 
 threading.Thread(target=telemetry_loop, daemon=True).start()
+
 App.run()

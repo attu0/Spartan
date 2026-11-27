@@ -14,6 +14,7 @@
 
   <exec_depend>spartan_bringup</exec_depend>
   <exec_depend>spartan_description</exec_depend>
+  <exec_depend>spartan_depth_cam</exec_depend>
   <exec_depend>spartan_gazebo</exec_depend>
 
   <export>
