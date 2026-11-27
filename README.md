@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assests/images/RealBuild/display.png" width="400" height="400">
+  <img src="resources/images/RealBuild/display.png" width="400" height="400">
 </p>
 
 # All Terrain Rover
@@ -75,11 +75,11 @@ Stereo camera         → USB hub → UNO Q
 ### Block Diagram & Circuit Schematic
 
 <p align="center">
-  <img src="assests/images/BlockDiagram&CircuitSchematic/image.png">
+  <img src="resources/images/BlockDiagram&CircuitSchematic/image.png">
 </p>
 
 <p align="center">
-  <img src="assests/images/BlockDiagram&CircuitSchematic/ckt.png" width="400" height="400">
+  <img src="resources/images/BlockDiagram&CircuitSchematic/ckt.png" width="400" height="400">
 </p>
 
 ## Code Structure
@@ -130,15 +130,15 @@ The result is a complete rover stack — robotic arm plus stereo camera with loc
 ### Project Images
 
 <p align="center">
-  <img src="assests/images/RealBuild/image.png" width="400" height="400">
+  <img src="resources/images/RealBuild/image.png" width="400" height="400">
 </p>
 
 <p align="center">
-  <img src="assests/images/RealBuild/img2.png" width="400" height="400">
+  <img src="resources/images/RealBuild/img2.png" width="400" height="400">
 </p>
 
 <p align="center">
-  <img src="assests/images/DepthCam/image.png">
+  <img src="resources/images/DepthCam/image.png">
 </p>
 
 ### Demo Videos
@@ -166,15 +166,15 @@ The result is a complete rover stack — robotic arm plus stereo camera with loc
 ### 3D Model / Render
 
 <p align="center">
-  <img src="assests/images/Render/arm6.png" width="400" height="400">
+  <img src="resources/images/Render/arm6.png" width="400" height="400">
 </p>
 
 <p align="center">
-  <img src="assests/images/Render/image.png" width="400" height="400">
+  <img src="resources/images/Render/image.png" width="400" height="400">
 </p>
 
 <p align="center">
-  <img src="assests/images/Render/rover_complete_assembly7(1).png">
+  <img src="resources/images/Render/rover_complete_assembly7(1).png">
 </p>
 
 ## Challenges, Learnings & Future Improvements
