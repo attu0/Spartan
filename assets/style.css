@@ -1,0 +1,955 @@
+:root {
+      --bg-workspace: #0B0F13;
+      --bg-brick: #131A20;
+      --bg-viewport: #080B0E;
+      --bg-panel-sub: #0F151A;
+      --bg-statusbar: #0E1318;
+      --border-color: #222D36;
+      --border-subtle: #1B242C;
+      --arduino-teal: #00979D;
+      --arduino-teal-bright: #00B5BC;
+      --arduino-teal-dim: rgba(0, 151, 157, 0.15);
+      --text-main: #F1F5F9;
+      --text-secondary: #CBD5E1;
+      --text-muted: #64748B;
+      --status-green: #10B981;
+      --status-amber: #F59E0B;
+      --status-red: #EF4444;
+      --status-cyan: #38BDF8;
+      --dpad-bg: #172027;
+      --dpad-border: #2B3945;
+      --chip-bg: rgba(11, 15, 19, 0.85);
+      --gauge-track: #1E293B;
+    }
+
+    /* HIGH-CONTRAST ARDUINO APP LAB LIGHT MODE */
+    [data-theme="light"] {
+      --bg-workspace: #F1F5F9;
+      --bg-brick: #FFFFFF;
+      --bg-viewport: #E2E8F0;
+      --bg-panel-sub: #F8FAFC;
+      --bg-statusbar: #1E293B;
+      --border-color: #CBD5E1;
+      --border-subtle: #E2E8F0;
+      --arduino-teal: #008184;
+      --arduino-teal-bright: #006B6E;
+      --arduino-teal-dim: rgba(0, 129, 132, 0.12);
+      --text-main: #0F172A;
+      --text-secondary: #1E293B;
+      --text-muted: #475569;
+      --dpad-bg: #FFFFFF;
+      --dpad-border: #94A3B8;
+      --chip-bg: rgba(255, 255, 255, 0.92);
+      --gauge-track: #CBD5E1;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body {
+      font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-workspace);
+      color: var(--text-main);
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+      display: flex;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .main-shell {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+    }
+
+    /* TOP HEADER */
+    .top-header {
+      height: 52px;
+      background: var(--bg-brick);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-mark {
+      width: 11px;
+      height: 11px;
+      border-radius: 3px;
+      background: var(--arduino-teal);
+      box-shadow: 0 0 8px rgba(0, 151, 157, 0.5);
+    }
+
+    .brand-title {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      color: var(--text-main);
+    }
+
+    .conn-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .ws-input {
+      background: var(--bg-panel-sub);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11.5px;
+      padding: 6px 10px;
+      border-radius: 5px;
+      width: 180px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .ws-input:focus {
+      border-color: var(--arduino-teal);
+    }
+
+    .btn-primary {
+      background: var(--arduino-teal);
+      color: #FFFFFF;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 6px 13px;
+      border-radius: 5px;
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+    .btn-primary:hover {
+      background: var(--arduino-teal-bright);
+    }
+
+    .btn-secondary {
+      background: var(--bg-panel-sub);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-color);
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .btn-secondary:hover, .btn-secondary.active {
+      border-color: var(--arduino-teal);
+      color: var(--arduino-teal-bright);
+      background: var(--arduino-teal-dim);
+    }
+
+    .btn-theme {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--bg-panel-sub);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+      padding: 5px 11px;
+      border-radius: 5px;
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .btn-theme:hover {
+      border-color: var(--arduino-teal);
+      color: var(--arduino-teal-bright);
+    }
+
+    /* SIM SWITCH */
+    .sim-toggle-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg-panel-sub);
+      border: 1px solid var(--border-color);
+      padding: 5px 11px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .sim-switch {
+      width: 30px;
+      height: 16px;
+      background: #475569;
+      border-radius: 99px;
+      position: relative;
+      transition: 0.2s;
+    }
+    .sim-switch::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #FFFFFF;
+      transition: 0.2s;
+    }
+    .sim-toggle-wrap.active {
+      border-color: var(--status-green);
+      background: rgba(16, 185, 129, 0.12);
+    }
+    .sim-toggle-wrap.active .sim-switch {
+      background: var(--status-green);
+    }
+    .sim-toggle-wrap.active .sim-switch::after {
+      transform: translateX(14px);
+    }
+    .sim-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    /* 3-COLUMN BENTO GRID */
+    .bento-grid {
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      padding: 12px 16px;
+      overflow: hidden;
+      min-height: 0;
+    }
+
+    .brick-card {
+      background: var(--bg-brick);
+      border: 1px solid var(--border-color);
+      border-top: 2.5px solid var(--arduino-teal);
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      padding: 11px 13px;
+      gap: 9px;
+      overflow: hidden;
+      min-height: 0;
+    }
+
+    .brick-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+      padding-bottom: 4px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .brick-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .brick-status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--text-muted);
+    }
+    .dot.teal { background: var(--arduino-teal); }
+    .dot.green { background: var(--status-green); }
+
+    /* VIEWPORTS */
+    .viewport-box {
+      background: var(--bg-viewport);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      position: relative;
+      overflow: hidden;
+      background-image:
+        linear-gradient(rgba(0, 151, 157, 0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 151, 157, 0.06) 1px, transparent 1px);
+      background-size: 20px 20px;
+    }
+
+    .vp-rover { height: 170px; flex-shrink: 0; }
+    .vp-arm   { height: 210px; flex-shrink: 0; }
+    .vp-leaf  { height: 175px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .vp-badge-overlay {
+      position: absolute;
+      top: 7px;
+      left: 8px;
+      right: 8px;
+      display: flex;
+      justify-content: space-between;
+      pointer-events: none;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10.5px;
+    }
+
+    .vp-chip {
+      background: var(--chip-bg);
+      border: 1px solid var(--border-color);
+      padding: 2px 7px;
+      border-radius: 4px;
+      color: var(--text-main);
+      font-weight: 600;
+    }
+
+    /* PANEL 1: MODE TABS (EITHER JOYSTICK OR D-PAD) */
+    .control-mode-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      background: var(--bg-panel-sub);
+      padding: 4px;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+      flex-shrink: 0;
+    }
+
+    .mode-tab {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-size: 11.5px;
+      font-weight: 600;
+      padding: 5px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .mode-tab.active {
+      background: var(--arduino-teal-dim);
+      color: var(--arduino-teal-bright);
+      border-color: var(--arduino-teal);
+    }
+
+    .locomotion-control-stage {
+      flex: 1;
+      display: flex;
+      min-height: 0;
+    }
+
+    .sub-box {
+      display: none;
+      width: 100%;
+      height: 100%;
+      background: var(--bg-panel-sub);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 12px;
+      align-items: center;
+      justify-content: center;
+    }
+    .sub-box.active-control {
+      display: flex;
+    }
+
+    .joy-layout {
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      width: 100%;
+      gap: 14px;
+    }
+
+    .joy-base {
+      width: 124px;
+      height: 124px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0, 151, 157, 0.12) 0%, var(--bg-viewport) 100%);
+      border: 1.5px solid var(--border-color);
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      touch-action: none;
+      cursor: grab;
+      flex-shrink: 0;
+    }
+    .joy-base::before {
+      content: '';
+      width: 76px;
+      height: 76px;
+      border-radius: 50%;
+      border: 1px dashed var(--arduino-teal);
+      position: absolute;
+      opacity: 0.45;
+    }
+    .joy-stick {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 32% 32%, #00B5BC, #006B70);
+      border: 2px solid #67E8F9;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+      position: absolute;
+      pointer-events: none;
+    }
+
+    .joy-metrics-col {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 1;
+    }
+
+    .sub-title {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      margin-bottom: 2px;
+    }
+
+    .joy-metric-item {
+      background: var(--bg-brick);
+      border: 1px solid var(--border-color);
+      padding: 5px 8px;
+      border-radius: 4px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--arduino-teal-bright);
+    }
+
+    /* D-PAD */
+    .dpad-layout {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+    }
+
+    .dpad-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 56px);
+      grid-template-rows: repeat(3, 42px);
+      gap: 6px;
+    }
+
+    .dpad-btn {
+      background: var(--dpad-bg);
+      border: 1px solid var(--dpad-border);
+      border-radius: 6px;
+      color: var(--text-main);
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-size: 11.5px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.1s;
+    }
+    .dpad-btn span {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px;
+      color: var(--text-muted);
+    }
+    .dpad-btn:active, .dpad-btn.active {
+      background: var(--arduino-teal);
+      border-color: var(--arduino-teal-bright);
+      color: #FFFFFF;
+      transform: scale(0.95);
+    }
+    .dpad-btn:active span, .dpad-btn.active span {
+      color: #E2E8F0;
+    }
+    .dpad-btn.stop-btn {
+      background: rgba(239, 68, 68, 0.15);
+      border-color: rgba(239, 68, 68, 0.55);
+      color: var(--status-red);
+    }
+    .dpad-btn.stop-btn:active, .dpad-btn.stop-btn.active {
+      background: var(--status-red);
+      color: #FFFFFF;
+    }
+
+    /* PANEL 2: POSES & 3-DOF SLIDERS */
+    .pose-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .sliders-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 1;
+      justify-content: space-between;
+      min-height: 0;
+    }
+
+    .slider-card {
+      background: var(--bg-panel-sub);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 6px 10px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 4px;
+      flex: 1;
+    }
+
+    .slider-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+    .slider-val {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11.5px;
+      color: var(--arduino-teal-bright);
+      font-weight: 700;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--arduino-teal);
+      height: 5px;
+      cursor: pointer;
+    }
+
+    .nozzle-auto-banner {
+      background: var(--bg-panel-sub);
+      border: 1px solid var(--border-color);
+      border-left: 3.5px solid var(--arduino-teal);
+      border-radius: 5px;
+      padding: 7px 11px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11.5px;
+      flex-shrink: 0;
+    }
+    .nozzle-auto-banner span {
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+    .nozzle-auto-banner strong {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      color: var(--arduino-teal-bright);
+    }
+    .nozzle-auto-banner.spraying {
+      border-left-color: var(--status-green);
+      background: rgba(16, 185, 129, 0.12);
+    }
+    .nozzle-auto-banner.spraying strong {
+      color: var(--status-green);
+    }
+    .nozzle-auto-banner.bypassed {
+      border-left-color: var(--status-cyan);
+    }
+
+    /* PANEL 3: LEAF CNN VISION */
+    .cam-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .cam-actions-left {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .pipeline-steps {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 5px;
+      flex-shrink: 0;
+    }
+    .pipe-step {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      font-weight: 500;
+      text-align: center;
+      padding: 5px 4px;
+      border-radius: 4px;
+      background: var(--bg-panel-sub);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      transition: 0.2s;
+    }
+    .pipe-step.active {
+      background: var(--arduino-teal-dim);
+      color: var(--arduino-teal-bright);
+      border-color: var(--arduino-teal);
+      font-weight: 700;
+    }
+
+    .cnn-results-box {
+      flex: 1;
+      background: var(--bg-panel-sub);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 8px 11px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: 0;
+    }
+
+    .cnn-grid {
+      display: grid;
+      grid-template-columns: 92px 1fr;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .gauge-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .gauge-track {
+      stroke: var(--gauge-track);
+    }
+    .gauge-text {
+      fill: var(--text-main);
+    }
+    .disease-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--arduino-teal-bright);
+      margin-top: 2px;
+    }
+
+    .prob-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .prob-row {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .prob-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+    .prob-label span:last-child {
+      font-family: 'IBM Plex Mono', monospace;
+      color: var(--text-main);
+    }
+    .prob-track {
+      height: 5px;
+      background: var(--gauge-track);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .prob-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--arduino-teal);
+      transition: width 0.35s ease;
+    }
+
+    /* ARDUINO APP LAB BOTTOM STATUS BAR */
+    .applab-statusbar {
+      height: 30px;
+      background: var(--bg-statusbar);
+      border-top: 1px solid var(--border-color);
+      border-bottom: none;
+      outline: none;
+      box-shadow: none;
+      padding: 0 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      color: #CBD5E1;
+      flex-shrink: 0;
+      z-index: 30;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    .sb-left, .sb-center, .sb-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      overflow: hidden;
+      border-bottom: none;
+      outline: none;
+    }
+
+    .sb-left {
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    #serialLogTxt {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .sb-item {
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .sb-board {
+      color: #38BDF8;
+      font-weight: 600;
+    }
+
+    .sb-gps {
+      background: rgba(0, 151, 157, 0.18);
+      border: 1px solid rgba(0, 181, 188, 0.4);
+      border-bottom: 1px solid rgba(0, 181, 188, 0.4);
+      outline: none;
+      box-shadow: none;
+      padding: 2px 8px;
+      border-radius: 4px;
+      color: #E2E8F0;
+    }
+    .sb-gps strong {
+      color: #5EEAD4;
+    }
+
+    .sb-divider {
+      color: #475569;
+    }
+
+    .sb-stop-btn {
+      background: #DC2626;
+      color: #FFFFFF;
+      border: none;
+      padding: 2px 9px;
+      border-radius: 3px;
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .sb-stop-btn:hover {
+      background: #EF4444;
+    }
+
+    /* ELEVATED TOAST ALERT (Completely hidden when inactive so no border peeks under status bar) */
+    .toast-alert {
+      position: fixed;
+      bottom: 46px;
+      right: 18px;
+      background: var(--bg-brick);
+      border: 1px solid var(--arduino-teal);
+      color: var(--text-main);
+      padding: 9px 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      display: none;
+      opacity: 0;
+      pointer-events: none;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.45);
+      z-index: 100;
+    }
+    .toast-alert.show {
+      display: flex;
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .toast-close {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* TOUCH OPTIMIZATIONS */
+    .dpad-btn, .btn-primary, .btn-secondary, .btn-theme, .mode-tab {
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      white-space: nowrap;
+    }
+
+    /* PORTRAIT ORIENTATION OVERLAY (Prompts user to rotate phone to Landscape) */
+
+    /* ============ SOCKET.IO PORT ADDITIONS ============ */
+    .link-pill {
+      display: inline-flex; align-items: center; gap: 7px;
+      font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--text-muted);
+      padding: 0 10px; height: 30px; border: 1px solid var(--border-color);
+      border-radius: 6px; background: var(--bg-panel-sub);
+    }
+    .link-pill .ldot { width: 7px; height: 7px; border-radius: 50%; background: var(--status-red); }
+    .link-pill.up { color: var(--text-secondary); }
+    .link-pill.up .ldot { background: var(--status-green); }
+
+
+
+    
+    .dpad-btn { touch-action: none; user-select: none; -webkit-user-select: none; }
+    :root { --bg-control: var(--bg-brick); --bg-control-hover: var(--bg-panel-sub); --shadow-card: 0 8px 24px rgba(0,0,0,.45); }
+    /* ---- System Resources Logger ---- */
+    .sb-res-btn { background: transparent; border: 1px solid var(--border-color); border-radius: 5px;
+      color: var(--text-secondary); cursor: pointer; padding: 0 8px; font: inherit; }
+    .sb-res-btn:hover { background: var(--bg-control-hover); }
+    .res-modal { position: fixed; inset: 0; z-index: 200; display: none; align-items: center;
+      justify-content: center; background: rgba(0,0,0,0.55); padding: 16px; }
+    .res-modal.show { display: flex; }
+    .res-card { width: min(1100px, 100%); max-height: calc(100vh - 32px); overflow: auto;
+      background: var(--bg-brick); border: 1px solid var(--border-color); border-radius: 10px;
+      box-shadow: var(--shadow-card); padding: 14px 16px 12px; }
+    .res-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+    .res-title { font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 13px;
+      letter-spacing: 1px; color: var(--arduino-teal-bright); text-transform: uppercase; margin-right: auto; }
+    .res-live-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--status-red); opacity: .35; }
+    .res-live-dot.flash { animation: resFlash 1s infinite alternate; opacity: 1; }
+    @keyframes resFlash { from { opacity: 1; } to { opacity: .1; } }
+    .res-tabs { display: inline-flex; gap: 4px; padding: 2px; border: 1px solid var(--border-color);
+      border-radius: 7px; background: var(--bg-panel-sub); }
+    .res-tab { border: 0; background: transparent; color: var(--text-muted); cursor: pointer;
+      font: 500 12px 'IBM Plex Sans', sans-serif; padding: 5px 16px; border-radius: 5px; }
+    .res-tab.active { background: var(--bg-control); color: var(--arduino-teal-bright);
+      font-weight: 700; box-shadow: 0 0 0 1px var(--border-color); }
+    .res-close { border: 0; background: transparent; color: var(--text-muted); font-size: 22px;
+      cursor: pointer; line-height: 1; padding: 0 6px; }
+    .res-close:hover { color: var(--text-main); }
+    .res-body { display: flex; gap: 14px; flex-wrap: wrap; }
+    .res-chart-box { flex: 1 1 420px; min-width: 0; background: var(--bg-panel-sub);
+      border: 1px solid var(--border-subtle); border-radius: 8px; padding: 10px 12px; }
+    .res-chart-title { font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600;
+      color: var(--text-secondary); margin-bottom: 8px; letter-spacing: .5px; }
+    .res-canvas-wrap { position: relative; height: 210px; }
+    .res-canvas-wrap canvas { width: 100%; height: 100%; display: block; }
+    .res-nodata { position: absolute; inset: 0; display: none; align-items: center; justify-content: center;
+      color: var(--text-muted); font-size: 12px; background: var(--bg-panel-sub); }
+    .res-hint { margin-top: 10px; font-size: 11px; color: var(--text-muted); }
+
+    .sb-res-btn { color: inherit; font-family: inherit; font-size: inherit; white-space: nowrap; }
+
+    /* ============ RESPONSIVE / MOBILE ============ */
+    * { -webkit-tap-highlight-color: transparent; }
+    html { -webkit-text-size-adjust: 100%; }
+
+    /* Viewports keep their canvas aspect ratio on any width (no stretching) */
+    .vp-rover { height: auto; aspect-ratio: 420 / 175; }
+    .vp-arm   { height: auto; aspect-ratio: 420 / 225; }
+    .vp-leaf  { height: auto; aspect-ratio: 420 / 180; }
+    .viewport-box canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+    .brick-card { overflow-y: auto; }
+
+    /* Phones, tablets and short landscape screens: scrolling page instead of fixed 3-column HUD */
+    @media (max-width: 1099px), (max-height: 639px) {
+      html, body { height: auto; min-height: 100%; width: 100%; overflow-x: hidden; overflow-y: auto; }
+      body { display: block; min-height: 100vh; min-height: 100dvh; }
+      .main-shell { height: auto; min-height: 100vh; min-height: 100dvh; width: 100%; overflow: visible; }
+      .top-header {
+        position: sticky; top: 0; z-index: 40; height: auto; min-height: 48px; flex-wrap: wrap;
+        padding: 6px 12px; padding-top: calc(6px + env(safe-area-inset-top));
+        padding-left: max(12px, env(safe-area-inset-left)); padding-right: max(12px, env(safe-area-inset-right));
+      }
+      .conn-group { flex-wrap: wrap; gap: 6px; }
+      .bento-grid {
+        flex: none; grid-template-columns: minmax(0, 1fr); overflow: visible; padding: 10px 12px;
+        padding-left: max(12px, env(safe-area-inset-left)); padding-right: max(12px, env(safe-area-inset-right));
+      }
+      .brick-card { overflow: visible; }
+      .applab-statusbar {
+        position: sticky; bottom: 0; height: auto; flex-wrap: wrap; row-gap: 4px; padding: 5px 12px;
+        padding-bottom: calc(5px + env(safe-area-inset-bottom));
+        padding-left: max(12px, env(safe-area-inset-left)); padding-right: max(12px, env(safe-area-inset-right));
+      }
+      .sb-left { order: 1; flex: 1 1 0; }
+      .sb-right { order: 2; }
+      .sb-center { order: 3; width: 100%; flex-shrink: 0; overflow-x: auto; justify-content: flex-start; scrollbar-width: none; }
+      .sb-center::-webkit-scrollbar { display: none; }
+      .toast-alert { left: 12px; right: 12px; bottom: calc(env(safe-area-inset-bottom) + 92px); }
+    }
+    @media (min-width: 720px) and (max-width: 1099px), (min-width: 720px) and (max-height: 639px) {
+      .bento-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      #panelCnn { grid-column: 1 / -1; }
+    }
+    @media (max-width: 720px) {
+      .brand-title { font-size: 14px; }
+      #themeTxt { display: none; }
+      .cam-toolbar, .cam-actions-left { flex-wrap: wrap; }
+      .pipe-step { font-size: 9px; padding: 5px 2px; }
+      .res-chart-box { flex-basis: 100%; }
+    }
+    /* Touch screens: bigger controls */
+    @media (pointer: coarse) {
+      .joy-base { width: 156px; height: 156px; }
+      .joy-base::before { width: 96px; height: 96px; }
+      .joy-stick { width: 50px; height: 50px; }
+      .dpad-grid { grid-template-columns: repeat(3, 78px); grid-template-rows: repeat(3, 60px); }
+      .dpad-btn { font-size: 13px; }
+      input[type="range"] { height: 28px; }
+      .btn-secondary, .btn-primary, .mode-tab, .btn-theme { min-height: 38px; }
+      .sb-stop-btn { padding: 6px 16px; font-size: 12px; }
+    }
+
+    /* ---- Live feed + simplified CNN result ---- */
+    .viewport-box img#liveFeedImg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; background: #000; }
+    .viewport-box canvas[hidden], .viewport-box img[hidden], .feed-status[hidden] { display: none !important; }
+    .feed-status {
+      position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+      padding: 8px; text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+      color: #E2E8F0; pointer-events: none; text-shadow: 0 1px 2px rgba(0,0,0,.6);
+    }
+    #liveFeedBtn.active { border-color: var(--arduino-teal); color: var(--arduino-teal-bright); }
+    .cnn-grid { grid-template-columns: 1fr; justify-items: center; }

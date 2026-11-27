@@ -2,5 +2,5 @@ name: Spartan
 description: using cnc shiled and uno q
 ports: []
 bricks:
-- arduino:streamlit_ui: {}
+- arduino:web_ui: {}
 icon: 😀
